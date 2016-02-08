@@ -2,7 +2,8 @@
 
 # Edit the keyboard map, default is US English
 apt-get install console-data
-dpkg-reconfigure keyboard-configuration
+# The dpkg-reconfigure is possibly not needed, as the install seems to ask for the keymap config
+#dpkg-reconfigure keyboard-configuration
 
 # Change the hostname to something more recognizeable
 nano /etc/hostname
@@ -24,7 +25,7 @@ apt-get install locate && updatedb # locate, find files, update the locate datab
 apt-get install virtualbox-guest-utils # virtualbox guest utilites
 apt-get install git-all # Git
 
-# Samba, so development can be done from vitual machine host
+# Samba, so development can be done from virtual machine host
 apt-get install samba
 
 cat <<EOT >> /etc/samba/smb.conf
@@ -34,9 +35,15 @@ cat <<EOT >> /etc/samba/smb.conf
 	read only = no
 EOT
 
+# This changes samba interface from eth0 to eth1, this assumes you have a VirtualBox machine with Host-Only Networking set up
+sed -i -e 's/;   interfaces = 127\.0\.0\.0\/8 eth0/  interfaces = 127\.0\.0\.0\/8 eth1/g' /etc/samba/smb.conf
+
 # Also reload the samba config
 sh /etc/init.d/samba reload
 
+# The sambauser needs a password
+clear
+echo "Samba user - bitnami - needs a password."
 smbpasswd -a bitnami
 
 # Samba needs to have these ports open to function
@@ -45,9 +52,3 @@ ufw allow 137 # NetBIOS Name Service
 ufw allow 138 # NetBIOS Datagram 
 ufw allow 139 # NetBIOS Session 
 ufw allow 445 # SMB over TCP 
-
-
-
-
-# TODO HOST ONLY NETWORKING SAMBA
-# SMBPASSWD STUFFS 
